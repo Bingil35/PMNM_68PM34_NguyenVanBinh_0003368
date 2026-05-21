@@ -1,49 +1,45 @@
 <?php
-    class App
+class App
+{
+    protected $controller = 'home';
+    protected $action = 'index';
+    protected $param = [];
+
+    public function __construct()
     {
-        protected $controller = 'home';
-        protected $action = 'index';
-        protected $param = [];
-
-        
-
-        public function __construct()
-        {
-                // if (isset($_GET['url'])) 
-                // {
-                //     echo ($_GET['url']);
-                // } 
-            $urlProcessed = $this->UrlProcess();
-            // var_dump($urlProcessed);
-            if(isset($urlProcessed[0]))
-                {
-                    if(file_exists('../app/controllers/' . $urlProcessed[0] . '.php'))
-                        {
-                            $this->controller = $urlProcessed[0];
-                            unset($urlProcessed[0]);
-                        }
-                }
-            
-            require_once '../app/controllers/' . $this->controller . '.php';
-            $this->controller = new $this->controller; //Tạo đối tượng
-            if(isset($urlProcessed[1]))
-                {
-                    if(method_exists($this->controller, $urlProcessed[1])){
-                        $this->action = $urlProcessed[1];
-                        unset($urlProcessed[1]);
-                    }
-                }
-                $this->params = $urlProcessed ? array_values($urlProcessed) : [];
-                call_user_func_array([$this->controller, $this->action], $this->params);
-
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
-        public function UrlProcess()
-        {
-                if (isset($_GET['url'])) 
-                {
-                    return explode('/', filter_var(trim($_GET['url'], '/'))); //loại bỏ các phần tử có dấu gạch đầu và cuối
-                }
+        $urlProcessed = $this->UrlProcess();
+
+        // 2. Xử lý Controller
+        if (isset($urlProcessed[0])) {
+            if (file_exists('../app/controllers/' . $urlProcessed[0] . '.php')) {
+                $this->controller = $urlProcessed[0];
+                unset($urlProcessed[0]);
+            }
+        }
+        
+        require_once '../app/controllers/' . $this->controller . '.php';
+        $this->controller = new $this->controller; // Tạo đối tượng
+
+        if (isset($urlProcessed[1])) {
+            if (method_exists($this->controller, $urlProcessed[1])) {
+                $this->action = $urlProcessed[1];
+                unset($urlProcessed[1]);
+            }
+        }
+
+        $this->param = $urlProcessed ? array_values($urlProcessed) : [];
+        call_user_func_array([$this->controller, $this->action], $this->param);
+    }
+
+    public function UrlProcess()
+    {
+        if (isset($_GET['url'])) {
+            return explode('/', filter_var(trim($_GET['url'], '/')));
         }
     }
+}
 ?>
