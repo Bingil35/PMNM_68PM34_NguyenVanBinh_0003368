@@ -1,9 +1,10 @@
 <?php
 require_once '../app/core/DB.php';
 class sinhvienModel {
-    public function __construct() {
-        $db = new ConnectDB();
-        $this->conn = $db->connect();
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = ConnectDB::Connect();
     }
     public function getAllSinhVien(){
         $query = "SELECT * FROM tbl_sinhviens";
