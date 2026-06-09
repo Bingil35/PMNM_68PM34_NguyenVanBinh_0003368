@@ -15,6 +15,8 @@
             width: 100%;
             height: 80px;
             background-color: #ff0505;
+            margin: 0;
+            padding: 0;
         }
         .content {
             width: 60%;
