@@ -3,6 +3,9 @@
     $currentOffset = isset($offset) ? (int) $offset : 0;
     $currentPage = $pageSize > 0 ? (int) floor($currentOffset / $pageSize) + 1 : 1;
     $studentCount = isset($sinhviens) ? count($sinhviens) : 0;
+    $totalRecord = isset($totalrecord) ? (int) $totalrecord : $studentCount;
+    $searchKeyword = $keyword ?? '';
+    $keywordQuery = $searchKeyword !== '' ? '?keyword=' . urlencode($searchKeyword) : '';
 ?>
 
 <section class="d-flex flex-column gap-4">
@@ -10,16 +13,38 @@
         <div>
             <p class="text-uppercase text-primary fw-bold small mb-2" style="letter-spacing: .08em;">Quản lý sinh viên</p>
             <h1 class="display-6 fw-bold mb-2">Danh sách sinh viên</h1>
-            <p class="text-muted mb-0">Theo dõi mã số, họ tên, lớp học và thông tin cơ bản của sinh viên.</p>
+            <p class="text-muted mb-0">Tìm kiếm theo MSSV, họ tên, mã lớp hoặc tên lớp.</p>
         </div>
         <a href="/sinhvien/create" class="btn btn-primary px-4 py-2">Thêm sinh viên</a>
     </div>
 
+    <form action="/sinhvien/index" method="get" class="app-card p-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-lg">
+                <label for="keyword" class="visually-hidden">Từ khóa tìm kiếm</label>
+                <input
+                    type="search"
+                    name="keyword"
+                    id="keyword"
+                    class="form-control form-control-lg rounded-4"
+                    placeholder="Nhập MSSV, họ tên, mã lớp hoặc tên lớp"
+                    value="<?php echo htmlspecialchars($searchKeyword); ?>"
+                >
+            </div>
+            <div class="col-lg-auto d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4 py-2">Tìm kiếm</button>
+                <?php if ($searchKeyword !== ''): ?>
+                    <a href="/sinhvien/index" class="btn btn-light border px-4 py-2">Xóa lọc</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </form>
+
     <div class="row g-3">
         <div class="col-md-4">
             <div class="app-card p-4 h-100">
-                <p class="text-muted mb-1">Đang hiển thị</p>
-                <div class="h2 fw-bold mb-0"><?php echo $studentCount; ?></div>
+                <p class="text-muted mb-1"><?php echo $searchKeyword !== '' ? 'Kết quả tìm thấy' : 'Đang hiển thị'; ?></p>
+                <div class="h2 fw-bold mb-0"><?php echo $searchKeyword !== '' ? $totalRecord : $studentCount; ?></div>
             </div>
         </div>
         <div class="col-md-4">
@@ -40,7 +65,13 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 p-4 border-bottom">
             <div>
                 <h2 class="h5 fw-bold mb-1">Hồ sơ sinh viên</h2>
-                <p class="text-muted mb-0">Danh sách được sắp xếp theo bản ghi mới nhất.</p>
+                <p class="text-muted mb-0">
+                    <?php if ($searchKeyword !== ''): ?>
+                        Đang lọc theo từ khóa "<?php echo htmlspecialchars($searchKeyword); ?>".
+                    <?php else: ?>
+                        Danh sách được sắp xếp theo bản ghi mới nhất.
+                    <?php endif; ?>
+                </p>
             </div>
         </div>
 
@@ -81,9 +112,15 @@
                     <?php else: ?>
                         <tr>
                             <td colspan="6" class="text-center p-5">
-                                <h3 class="h5 fw-bold mb-2">Chưa có sinh viên</h3>
-                                <p class="text-muted mb-3">Thêm sinh viên đầu tiên để bắt đầu quản lý danh sách.</p>
-                                <a href="/sinhvien/create" class="btn btn-primary px-4">Thêm sinh viên</a>
+                                <h3 class="h5 fw-bold mb-2">Không tìm thấy sinh viên</h3>
+                                <p class="text-muted mb-3">
+                                    <?php echo $searchKeyword !== '' ? 'Hãy thử tìm bằng từ khóa khác.' : 'Thêm sinh viên đầu tiên để bắt đầu quản lý danh sách.'; ?>
+                                </p>
+                                <?php if ($searchKeyword !== ''): ?>
+                                    <a href="/sinhvien/index" class="btn btn-light border px-4">Xóa lọc</a>
+                                <?php else: ?>
+                                    <a href="/sinhvien/create" class="btn btn-primary px-4">Thêm sinh viên</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -97,7 +134,7 @@
                     <?php for ($i = 1; $i <= (int) $totalpage; $i++): ?>
                         <?php $pageOffset = ($i - 1) * $pageSize; ?>
                         <li class="page-item <?php echo $i === $currentPage ? 'active' : ''; ?>">
-                            <a class="page-link rounded-pill border-0 px-3" href="/sinhvien/index/<?php echo $pageSize; ?>/<?php echo $pageOffset; ?>">
+                            <a class="page-link rounded-pill border-0 px-3" href="/sinhvien/index/<?php echo $pageSize; ?>/<?php echo $pageOffset; ?><?php echo $keywordQuery; ?>">
                                 <?php echo $i; ?>
                             </a>
                         </li>

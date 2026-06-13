@@ -58,26 +58,50 @@ class SinhvienModel
         return $stmt->execute();
     }
 
-    public function paging($limit = 5, $offset = 0)
+    public function paging($limit = 5, $offset = 0, $keyword = '')
     {
+        $keyword = trim($keyword);
+        $where = '';
+
+        if ($keyword !== '') {
+            $where = "WHERE sv.mssv LIKE :keyword
+                      OR sv.hoten LIKE :keyword
+                      OR sv.malop LIKE :keyword
+                      OR l.tenlop LIKE :keyword";
+        }
+
         $query = "SELECT sv.*, l.tenlop
                   FROM tbl_sinhviens sv
                   LEFT JOIN tbl_lops l ON sv.malop = l.malop
+                  {$where}
                   ORDER BY sv.ID DESC
                   LIMIT :limit OFFSET :offset";
         $stmt = $this->conn->prepare($query);
+        if ($keyword !== '') {
+            $keywordLike = '%' . $keyword . '%';
+            $stmt->bindParam(':keyword', $keywordLike);
+        }
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $selectAllQuery = $this->conn->query("SELECT COUNT(*) FROM tbl_sinhviens");
-        $totalRecord = (int) $selectAllQuery->fetchColumn();
+        $countQuery = "SELECT COUNT(*)
+                       FROM tbl_sinhviens sv
+                       LEFT JOIN tbl_lops l ON sv.malop = l.malop
+                       {$where}";
+        $countStmt = $this->conn->prepare($countQuery);
+        if ($keyword !== '') {
+            $countStmt->bindParam(':keyword', $keywordLike);
+        }
+        $countStmt->execute();
+        $totalRecord = (int) $countStmt->fetchColumn();
         $totalPage = $limit > 0 ? (int) ceil($totalRecord / $limit) : 0;
 
         return [
             'sinhviens' => $result,
-            'totalpage' => $totalPage
+            'totalpage' => $totalPage,
+            'totalrecord' => $totalRecord
         ];
     }
 }

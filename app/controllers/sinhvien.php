@@ -8,16 +8,19 @@ class sinhvien extends Controller
 {
     public function index($limit = 5, $offset = 0)
     {
+        $keyword = trim($_GET['keyword'] ?? '');
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->paging((int) $limit, (int) $offset);
+        $result = $sinhvienModel->paging((int) $limit, (int) $offset, $keyword);
 
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/index',
             'sinhviens' => $result['sinhviens'],
             'title' => 'Danh sách sinh viên',
             'totalpage' => $result['totalpage'],
+            'totalrecord' => $result['totalrecord'],
             'limit' => $limit,
-            'offset' => $offset
+            'offset' => $offset,
+            'keyword' => $keyword
         ]);
     }
 
