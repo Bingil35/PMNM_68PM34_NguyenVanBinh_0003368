@@ -15,6 +15,12 @@
         <a href="/lop/create" class="btn btn-primary px-4 py-2">Thêm lớp học</a>
     </div>
 
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-warning mb-0">
+            <?php echo htmlspecialchars($message); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="row g-3">
         <div class="col-md-4">
             <div class="app-card p-4 h-100">
@@ -66,7 +72,7 @@
                                 <td class="pe-4">
                                     <div class="d-flex justify-content-end align-items-center gap-2 flex-nowrap">
                                         <a href="/lop/edit/<?php echo (int) $lop['ID']; ?>" class="btn btn-sm btn-light border px-3 text-nowrap">Sửa</a>
-                                        <form class="m-0" action="/lop/delete/<?php echo (int) $lop['ID']; ?>" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa lớp học này?');">
+                                        <form class="m-0" action="/lop/delete/<?php echo (int) $lop['ID']; ?>" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa lớp học này? Chỉ có thể xóa khi không còn sinh viên thuộc lớp.');">
                                             <button type="submit" class="btn btn-sm btn-outline-danger px-3 text-nowrap">Xóa</button>
                                         </form>
                                     </div>

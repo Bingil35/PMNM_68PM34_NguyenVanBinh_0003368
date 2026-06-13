@@ -1,74 +1,84 @@
 <?php
-    require_once '../app/core/DB.php';
-    class SinhvienModel{
-        private $conn;
+require_once '../app/core/DB.php';
 
-        public function __construct(){
-            $this->conn = ConnectDB::Connect();
-        }
+class SinhvienModel
+{
+    private $conn;
 
-        public function getAllSinhvien(){
-            $query = "SELECT * FROM tbl_sinhviens";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        public function create($hoten, $gioitinh, $mssv) {
-            $query = "INSERT INTO tbl_sinhviens (hoten, gioitinh, mssv) VALUES (:hoten, :gioitinh, :mssv)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':hoten', $hoten);
-            $stmt->bindParam(':gioitinh', $gioitinh);
-            $stmt->bindParam(':mssv', $mssv);
-            if($stmt->execute()) { 
-                return true;
-                    
-            } else {
-                return false;
-            }
-        }
-
-        public function getById($id) {
-            $query = "SELECT * FROM tbl_sinhviens WHERE id = :id LIMIT 1";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-
-        public function update($id, $hoten, $gioitinh, $mssv) {
-            $query = "UPDATE tbl_sinhviens SET hoten = :hoten, gioitinh = :gioitinh, mssv = :mssv WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->bindParam(':hoten', $hoten);
-            $stmt->bindParam(':gioitinh', $gioitinh);
-            $stmt->bindParam(':mssv', $mssv);
-            return $stmt->execute();
-        }
-
-        public function delete($id) {
-            $query = "DELETE FROM tbl_sinhviens WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            return $stmt->execute();
-        }
-
-        public function paging($limit = 5, $offset = 0, $search = ""){
-            $query = "SELECT * FROM tbl_sinhviens LIMIT :limit OFFSET :offset";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            //Calculate total page
-            $selectAllQuery = $this->conn->query("SELECT COUNT(*) FROM tbl_sinhviens");
-            $totalRecord = $selectAllQuery->fetchColumn();
-
-            $totalPage = ceil($totalRecord/$limit);
-
-            return ["sinhviens"=>$result, "totalpage"=>$totalPage];
-        }
+    public function __construct()
+    {
+        $this->conn = ConnectDB::Connect();
     }
+
+    public function getAllSinhvien()
+    {
+        $query = "SELECT sv.*, l.tenlop FROM tbl_sinhviens sv LEFT JOIN tbl_lops l ON sv.malop = l.malop";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function create($hoten, $gioitinh, $mssv, $malop)
+    {
+        $query = "INSERT INTO tbl_sinhviens (hoten, gioitinh, mssv, malop) VALUES (:hoten, :gioitinh, :mssv, :malop)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':hoten', $hoten);
+        $stmt->bindParam(':gioitinh', $gioitinh);
+        $stmt->bindParam(':mssv', $mssv);
+        $stmt->bindParam(':malop', $malop);
+        return $stmt->execute();
+    }
+
+    public function getById($id)
+    {
+        $query = "SELECT * FROM tbl_sinhviens WHERE ID = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update($id, $hoten, $gioitinh, $mssv, $malop)
+    {
+        $query = "UPDATE tbl_sinhviens SET hoten = :hoten, gioitinh = :gioitinh, mssv = :mssv, malop = :malop WHERE ID = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':hoten', $hoten);
+        $stmt->bindParam(':gioitinh', $gioitinh);
+        $stmt->bindParam(':mssv', $mssv);
+        $stmt->bindParam(':malop', $malop);
+        return $stmt->execute();
+    }
+
+    public function delete($id)
+    {
+        $query = "DELETE FROM tbl_sinhviens WHERE ID = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function paging($limit = 5, $offset = 0)
+    {
+        $query = "SELECT sv.*, l.tenlop
+                  FROM tbl_sinhviens sv
+                  LEFT JOIN tbl_lops l ON sv.malop = l.malop
+                  ORDER BY sv.ID DESC
+                  LIMIT :limit OFFSET :offset";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $selectAllQuery = $this->conn->query("SELECT COUNT(*) FROM tbl_sinhviens");
+        $totalRecord = (int) $selectAllQuery->fetchColumn();
+        $totalPage = $limit > 0 ? (int) ceil($totalRecord / $limit) : 0;
+
+        return [
+            'sinhviens' => $result,
+            'totalpage' => $totalPage
+        ];
+    }
+}
 ?>

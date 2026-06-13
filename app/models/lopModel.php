@@ -20,6 +20,14 @@ class lopModel
         return $stmt->execute();
     }
 
+    public function getAll()
+    {
+        $query = "SELECT * FROM tbl_lops ORDER BY malop ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getById($id)
     {
         $query = "SELECT * FROM tbl_lops WHERE ID = :id LIMIT 1";
@@ -29,15 +37,23 @@ class lopModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $malop, $tenlop, $ghichu)
+    public function update($id, $tenlop, $ghichu)
     {
-        $query = "UPDATE tbl_lops SET malop = :malop, tenlop = :tenlop, ghichu = :ghichu WHERE ID = :id";
+        $query = "UPDATE tbl_lops SET tenlop = :tenlop, ghichu = :ghichu WHERE ID = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':malop', $malop);
         $stmt->bindParam(':tenlop', $tenlop);
         $stmt->bindParam(':ghichu', $ghichu);
         return $stmt->execute();
+    }
+
+    public function countSinhvienByMalop($malop)
+    {
+        $query = "SELECT COUNT(*) FROM tbl_sinhviens WHERE malop = :malop";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':malop', $malop);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
     }
 
     public function delete($id)

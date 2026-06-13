@@ -5,7 +5,7 @@ require_once '../app/models/lopModel.php';
 
 class lop extends Controller
 {
-    public function index($limit = 5, $offset = 0)
+    public function index($limit = 5, $offset = 0, $message = '')
     {
         $lopModel = $this->model('lopModel');
         $result = $lopModel->paging((int) $limit, (int) $offset);
@@ -16,7 +16,8 @@ class lop extends Controller
             'title' => 'Danh sách lớp học',
             'totalpage' => $result['totalpage'],
             'limit' => $limit,
-            'offset' => $offset
+            'offset' => $offset,
+            'message' => $this->getMessageText($message)
         ]);
     }
 
@@ -30,9 +31,9 @@ class lop extends Controller
 
     public function store()
     {
-        $malop = $_POST['malop'] ?? '';
-        $tenlop = $_POST['tenlop'] ?? '';
-        $ghichu = $_POST['ghichu'] ?? '';
+        $malop = trim($_POST['malop'] ?? '');
+        $tenlop = trim($_POST['tenlop'] ?? '');
+        $ghichu = trim($_POST['ghichu'] ?? '');
 
         $lopModel = $this->model('lopModel');
         $result = $lopModel->create($malop, $tenlop, $ghichu);
@@ -64,12 +65,11 @@ class lop extends Controller
 
     public function update($id)
     {
-        $malop = $_POST['malop'] ?? '';
-        $tenlop = $_POST['tenlop'] ?? '';
-        $ghichu = $_POST['ghichu'] ?? '';
+        $tenlop = trim($_POST['tenlop'] ?? '');
+        $ghichu = trim($_POST['ghichu'] ?? '');
 
         $lopModel = $this->model('lopModel');
-        $result = $lopModel->update((int) $id, $malop, $tenlop, $ghichu);
+        $result = $lopModel->update((int) $id, $tenlop, $ghichu);
 
         if ($result) {
             header('Location: /lop/index');
@@ -82,6 +82,18 @@ class lop extends Controller
     public function delete($id)
     {
         $lopModel = $this->model('lopModel');
+        $lop = $lopModel->getById((int) $id);
+
+        if (!$lop) {
+            header('Location: /lop/index/5/0/not-found');
+            return;
+        }
+
+        if ($lopModel->countSinhvienByMalop($lop['malop']) > 0) {
+            header('Location: /lop/index/5/0/has-students');
+            return;
+        }
+
         $result = $lopModel->delete((int) $id);
 
         if ($result) {
@@ -89,7 +101,21 @@ class lop extends Controller
             return;
         }
 
-        echo 'Xóa lớp học không thành công';
+        header('Location: /lop/index/5/0/delete-failed');
+    }
+
+    private function getMessageText($message)
+    {
+        switch ($message) {
+            case 'has-students':
+                return 'Không thể xóa lớp học vì vẫn còn sinh viên thuộc lớp này.';
+            case 'not-found':
+                return 'Không tìm thấy lớp học cần xóa.';
+            case 'delete-failed':
+                return 'Xóa lớp học không thành công.';
+            default:
+                return '';
+        }
     }
 }
 ?>

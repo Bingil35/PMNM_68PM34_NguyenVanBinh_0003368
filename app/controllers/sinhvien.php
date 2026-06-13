@@ -2,18 +2,19 @@
 
 require_once '../app/core/Controller.php';
 require_once '../app/models/sinhvienModel.php';
+require_once '../app/models/lopModel.php';
 
 class sinhvien extends Controller
 {
     public function index($limit = 5, $offset = 0)
     {
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->paging($limit, $offset);
+        $result = $sinhvienModel->paging((int) $limit, (int) $offset);
 
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/index',
             'sinhviens' => $result['sinhviens'],
-            'title' => 'Danh sach sinh vien',
+            'title' => 'Danh sách sinh viên',
             'totalpage' => $result['totalpage'],
             'limit' => $limit,
             'offset' => $offset
@@ -22,20 +23,24 @@ class sinhvien extends Controller
 
     public function create()
     {
+        $lopModel = $this->model('lopModel');
+
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/create',
-            'title' => 'Thêm sinh viên'
+            'title' => 'Thêm sinh viên',
+            'lops' => $lopModel->getAll()
         ]);
     }
 
     public function store()
     {
-        $hoten = $_POST['hoten'];
-        $gioitinh = $_POST['gioitinh'];
-        $mssv = $_POST['mssv'];
+        $hoten = $_POST['hoten'] ?? '';
+        $gioitinh = $_POST['gioitinh'] ?? '';
+        $mssv = $_POST['mssv'] ?? '';
+        $malop = $_POST['malop'] ?? '';
 
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->create($hoten, $gioitinh, $mssv);
+        $result = $sinhvienModel->create($hoten, $gioitinh, $mssv, $malop);
 
         if ($result) {
             header('Location: /sinhvien/index');
@@ -48,6 +53,7 @@ class sinhvien extends Controller
     public function edit($id)
     {
         $sinhvienModel = $this->model('sinhvienModel');
+        $lopModel = $this->model('lopModel');
         $sinhvien = $sinhvienModel->getById((int) $id);
 
         if (!$sinhvien) {
@@ -58,18 +64,20 @@ class sinhvien extends Controller
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/edit',
             'title' => 'Cập nhật sinh viên',
-            'sinhvien' => $sinhvien
+            'sinhvien' => $sinhvien,
+            'lops' => $lopModel->getAll()
         ]);
     }
 
     public function update($id)
     {
-        $hoten = $_POST['hoten'];
-        $gioitinh = $_POST['gioitinh'];
-        $mssv = $_POST['mssv'];
+        $hoten = $_POST['hoten'] ?? '';
+        $gioitinh = $_POST['gioitinh'] ?? '';
+        $mssv = $_POST['mssv'] ?? '';
+        $malop = $_POST['malop'] ?? '';
 
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->update((int) $id, $hoten, $gioitinh, $mssv);
+        $result = $sinhvienModel->update((int) $id, $hoten, $gioitinh, $mssv, $malop);
 
         if ($result) {
             header('Location: /sinhvien/index');
@@ -89,6 +97,7 @@ class sinhvien extends Controller
             return;
         }
 
-        echo 'Xoá sinh viên không thành công';
+        echo 'Xóa sinh viên không thành công';
     }
 }
+?>

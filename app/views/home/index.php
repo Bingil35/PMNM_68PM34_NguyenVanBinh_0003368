@@ -1,5 +1,5 @@
 <?php
-    $username = $_SESSION['username'] ?? 'nguoi dung';
+    $username = $_SESSION['username'] ?? 'người dùng';
 ?>
 <!DOCTYPE html>
 <html lang="vi">

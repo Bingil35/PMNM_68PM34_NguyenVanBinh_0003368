@@ -2,8 +2,8 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
         <div>
             <p class="text-uppercase text-primary fw-bold small mb-2" style="letter-spacing: .08em;">Cập nhật lớp học</p>
-            <h1 class="display-6 fw-bold mb-2">Cập nhật lớp học</h1>
-            <p class="text-muted mb-0">Điều chỉnh mã lớp, tên lớp và ghi chú của lớp học.</p>
+            <h1 class="display-6 fw-bold mb-2">Sửa lớp học</h1>
+            <p class="text-muted mb-0">Chỉ có thể chỉnh sửa tên lớp và ghi chú. Mã lớp được dùng để liên kết sinh viên nên không thể thay đổi.</p>
         </div>
         <a href="/lop/index" class="btn btn-light border px-4 py-2">Quay lại</a>
     </div>
@@ -11,8 +11,8 @@
     <div class="app-card p-4 p-lg-5">
         <form action="/lop/update/<?php echo (int) $lop['ID']; ?>" method="post" class="row g-4">
             <div class="col-md-6">
-                <label for="malop" class="form-label fw-semibold">Mã lớp</label>
-                <input type="text" name="malop" id="malop" class="form-control form-control-lg rounded-4" value="<?php echo htmlspecialchars($lop['malop']); ?>" required>
+                <label for="malop_display" class="form-label fw-semibold">Mã lớp</label>
+                <input type="text" id="malop_display" class="form-control form-control-lg rounded-4 bg-light" value="<?php echo htmlspecialchars($lop['malop']); ?>" readonly>
             </div>
 
             <div class="col-md-6">
