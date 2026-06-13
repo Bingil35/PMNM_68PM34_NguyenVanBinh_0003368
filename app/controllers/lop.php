@@ -7,8 +7,23 @@ class lop extends Controller
 {
     public function index($limit = 5, $offset = 0, $message = '')
     {
+        $allowedPageSizes = [5, 10, 20, 50];
+
+        if (isset($_GET['limit'])) {
+            $limit = (int) $_GET['limit'];
+            $offset = 0;
+        }
+
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
+        if (!in_array($limit, $allowedPageSizes, true)) {
+            $limit = 5;
+            $offset = 0;
+        }
+
         $lopModel = $this->model('lopModel');
-        $result = $lopModel->paging((int) $limit, (int) $offset);
+        $result = $lopModel->paging($limit, $offset);
 
         $this->view('layout/masterlayout', [
             'viewname' => 'lop/index',

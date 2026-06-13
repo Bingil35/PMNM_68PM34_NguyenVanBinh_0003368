@@ -4,6 +4,7 @@
     $currentPage = $pageSize > 0 ? (int) floor($currentOffset / $pageSize) + 1 : 1;
     $classCount = isset($lops) ? count($lops) : 0;
     $totalPages = isset($totalpage) ? (int) $totalpage : 0;
+    $pageSizeOptions = [5, 10, 20, 50];
     $paginationItems = [];
 
     if ($totalPages > 0) {
@@ -49,6 +50,24 @@
             <?php echo htmlspecialchars($message); ?>
         </div>
     <?php endif; ?>
+
+    <form action="/lop/index" method="get" class="app-card p-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-sm-6 col-lg-3">
+                <label for="limit" class="form-label fw-semibold">Số dòng/trang</label>
+                <select name="limit" id="limit" class="form-select form-select-lg rounded-4">
+                    <?php foreach ($pageSizeOptions as $option): ?>
+                        <option value="<?php echo $option; ?>" <?php echo $pageSize === $option ? 'selected' : ''; ?>>
+                            <?php echo $option; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-sm-auto">
+                <button type="submit" class="btn btn-primary px-4 py-2">Áp dụng</button>
+            </div>
+        </div>
+    </form>
 
     <div class="row g-3">
         <div class="col-md-4">

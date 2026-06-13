@@ -11,8 +11,22 @@ class sinhvien extends Controller
         $keyword = trim($_GET['keyword'] ?? '');
         $sort = $_GET['sort'] ?? '';
         $dir = $_GET['dir'] ?? 'asc';
+        $allowedPageSizes = [5, 10, 20, 50];
         $allowedSorts = ['hoten', 'mssv'];
         $allowedDirs = ['asc', 'desc'];
+
+        if (isset($_GET['limit'])) {
+            $limit = (int) $_GET['limit'];
+            $offset = 0;
+        }
+
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
+        if (!in_array($limit, $allowedPageSizes, true)) {
+            $limit = 5;
+            $offset = 0;
+        }
 
         if (!in_array($sort, $allowedSorts, true)) {
             $sort = '';
@@ -23,7 +37,7 @@ class sinhvien extends Controller
         }
 
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->paging((int) $limit, (int) $offset, $keyword, $sort, $dir);
+        $result = $sinhvienModel->paging($limit, $offset, $keyword, $sort, $dir);
 
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/index',

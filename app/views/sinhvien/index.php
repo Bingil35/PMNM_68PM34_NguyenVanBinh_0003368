@@ -7,6 +7,7 @@
     $searchKeyword = $keyword ?? '';
     $currentSort = $sort ?? '';
     $currentDir = $dir ?? 'asc';
+    $pageSizeOptions = [5, 10, 20, 50];
     $queryParams = [];
 
     if ($searchKeyword !== '') {
@@ -88,6 +89,17 @@
                 <select name="dir" id="dir" class="form-select form-select-lg rounded-4">
                     <option value="asc" <?php echo $currentDir === 'asc' ? 'selected' : ''; ?>>Tăng dần</option>
                     <option value="desc" <?php echo $currentDir === 'desc' ? 'selected' : ''; ?>>Giảm dần</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 col-lg-2">
+                <label for="limit" class="form-label fw-semibold">Số dòng/trang</label>
+                <select name="limit" id="limit" class="form-select form-select-lg rounded-4">
+                    <?php foreach ($pageSizeOptions as $option): ?>
+                        <option value="<?php echo $option; ?>" <?php echo $pageSize === $option ? 'selected' : ''; ?>>
+                            <?php echo $option; ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
 
