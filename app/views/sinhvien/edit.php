@@ -13,6 +13,12 @@
         <a href="/sinhvien/index" class="btn btn-light border px-4 py-2">Quay lại</a>
     </div>
 
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger mb-0">
+            <?php echo htmlspecialchars($error); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="app-card p-4 p-lg-5">
         <form action="/sinhvien/update/<?php echo (int) $sinhvien['ID']; ?>" method="post" class="row g-4">
             <div class="col-12">

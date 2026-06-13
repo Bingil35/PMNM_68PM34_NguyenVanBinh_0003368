@@ -46,18 +46,38 @@ class sinhvien extends Controller
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/create',
             'title' => 'Thêm sinh viên',
-            'lops' => $lopModel->getAll()
+            'lops' => $lopModel->getAll(),
+            'sinhvien' => [],
+            'error' => ''
         ]);
     }
 
     public function store()
     {
-        $hoten = $_POST['hoten'] ?? '';
+        $hoten = trim($_POST['hoten'] ?? '');
         $gioitinh = $_POST['gioitinh'] ?? '';
-        $mssv = $_POST['mssv'] ?? '';
+        $mssv = trim($_POST['mssv'] ?? '');
         $malop = $_POST['malop'] ?? '';
 
         $sinhvienModel = $this->model('sinhvienModel');
+        $lopModel = $this->model('lopModel');
+
+        if ($sinhvienModel->existsMssv($mssv)) {
+            $this->view('layout/masterlayout', [
+                'viewname' => 'sinhvien/create',
+                'title' => 'Thêm sinh viên',
+                'lops' => $lopModel->getAll(),
+                'sinhvien' => [
+                    'hoten' => $hoten,
+                    'gioitinh' => $gioitinh,
+                    'mssv' => $mssv,
+                    'malop' => $malop
+                ],
+                'error' => 'MSSV đã tồn tại. Vui lòng nhập MSSV khác.'
+            ]);
+            return;
+        }
+
         $result = $sinhvienModel->create($hoten, $gioitinh, $mssv, $malop);
 
         if ($result) {
@@ -83,18 +103,38 @@ class sinhvien extends Controller
             'viewname' => 'sinhvien/edit',
             'title' => 'Cập nhật sinh viên',
             'sinhvien' => $sinhvien,
-            'lops' => $lopModel->getAll()
+            'lops' => $lopModel->getAll(),
+            'error' => ''
         ]);
     }
 
     public function update($id)
     {
-        $hoten = $_POST['hoten'] ?? '';
+        $hoten = trim($_POST['hoten'] ?? '');
         $gioitinh = $_POST['gioitinh'] ?? '';
-        $mssv = $_POST['mssv'] ?? '';
+        $mssv = trim($_POST['mssv'] ?? '');
         $malop = $_POST['malop'] ?? '';
 
         $sinhvienModel = $this->model('sinhvienModel');
+        $lopModel = $this->model('lopModel');
+
+        if ($sinhvienModel->existsMssv($mssv, (int) $id)) {
+            $this->view('layout/masterlayout', [
+                'viewname' => 'sinhvien/edit',
+                'title' => 'Cập nhật sinh viên',
+                'sinhvien' => [
+                    'ID' => (int) $id,
+                    'hoten' => $hoten,
+                    'gioitinh' => $gioitinh,
+                    'mssv' => $mssv,
+                    'malop' => $malop
+                ],
+                'lops' => $lopModel->getAll(),
+                'error' => 'MSSV đã tồn tại. Vui lòng nhập MSSV khác.'
+            ]);
+            return;
+        }
+
         $result = $sinhvienModel->update((int) $id, $hoten, $gioitinh, $mssv, $malop);
 
         if ($result) {

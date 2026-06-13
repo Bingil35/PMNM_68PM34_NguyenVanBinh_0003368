@@ -29,6 +29,25 @@ class SinhvienModel
         return $stmt->execute();
     }
 
+    public function existsMssv($mssv, $ignoreId = null)
+    {
+        $query = "SELECT COUNT(*) FROM tbl_sinhviens WHERE mssv = :mssv";
+
+        if ($ignoreId !== null) {
+            $query .= " AND ID != :ignoreId";
+        }
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':mssv', $mssv);
+
+        if ($ignoreId !== null) {
+            $stmt->bindParam(':ignoreId', $ignoreId, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
     public function getById($id)
     {
         $query = "SELECT * FROM tbl_sinhviens WHERE ID = :id LIMIT 1";
