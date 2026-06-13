@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chu - Student Manager</title>
+    <title>Trang chủ - Student Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -93,7 +93,10 @@
                 <p class="text-muted mb-4">
                     Bạn đã đăng nhập thành công. Hãy chọn khu vực quản lý trong thanh điều hướng để tiếp tục làm việc.
                 </p>
-                <a href="/sinhvien/index" class="btn btn-primary px-4 py-2">Quản lý sinh viên</a>
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <a href="/sinhvien/index" class="btn btn-primary px-4 py-2">Quản lý sinh viên</a>
+                    <a href="/lop/index" class="btn btn-light border px-4 py-2">Quản lý lớp học</a>
+                </div>
             </section>
         </main>
 

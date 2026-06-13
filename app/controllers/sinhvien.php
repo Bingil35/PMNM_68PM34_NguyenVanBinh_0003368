@@ -24,7 +24,7 @@ class sinhvien extends Controller
     {
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/create',
-            'title' => 'Them sinh vien'
+            'title' => 'Thêm sinh viên'
         ]);
     }
 
@@ -42,7 +42,7 @@ class sinhvien extends Controller
             return;
         }
 
-        echo 'Them moi sinh vien that bai';
+        echo 'Thêm mới sinh viên không thành công';
     }
 
     public function edit($id)
@@ -51,13 +51,13 @@ class sinhvien extends Controller
         $sinhvien = $sinhvienModel->getById((int) $id);
 
         if (!$sinhvien) {
-            echo 'Khong tim thay sinh vien';
+            echo 'Không tìm thấy sinh viên';
             return;
         }
 
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/edit',
-            'title' => 'Cap nhat sinh vien',
+            'title' => 'Cập nhật sinh viên',
             'sinhvien' => $sinhvien
         ]);
     }

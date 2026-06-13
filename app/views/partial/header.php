@@ -18,6 +18,9 @@
                     <li class="nav-item">
                         <a class="nav-link fw-semibold text-secondary" href="/sinhvien/index">Quản lý sinh viên</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold text-secondary" href="/lop/index">Quản lý lớp học</a>
+                    </li>
                 </ul>
             </div>
         </div>
