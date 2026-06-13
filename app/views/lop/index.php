@@ -3,6 +3,35 @@
     $currentOffset = isset($offset) ? (int) $offset : 0;
     $currentPage = $pageSize > 0 ? (int) floor($currentOffset / $pageSize) + 1 : 1;
     $classCount = isset($lops) ? count($lops) : 0;
+    $totalPages = isset($totalpage) ? (int) $totalpage : 0;
+    $paginationItems = [];
+
+    if ($totalPages > 0) {
+        if ($totalPages <= 8) {
+            $paginationItems = range(1, $totalPages);
+        } else {
+            $pages = [1, 2, 3, $totalPages - 2, $totalPages - 1, $totalPages];
+
+            for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                if ($i >= 1 && $i <= $totalPages) {
+                    $pages[] = $i;
+                }
+            }
+
+            $pages = array_values(array_unique($pages));
+            sort($pages);
+
+            $previousPage = 0;
+            foreach ($pages as $page) {
+                if ($previousPage > 0 && $page - $previousPage > 1) {
+                    $paginationItems[] = 'ellipsis-' . $previousPage;
+                }
+
+                $paginationItems[] = $page;
+                $previousPage = $page;
+            }
+        }
+    }
 ?>
 
 <section class="d-flex flex-column gap-4">
@@ -92,17 +121,23 @@
             </table>
         </div>
 
-        <?php if (isset($totalpage) && (int) $totalpage > 1): ?>
+        <?php if ($totalPages > 1): ?>
             <nav aria-label="Phân trang danh sách lớp học" class="p-4 border-top">
                 <ul class="pagination justify-content-center mb-0 gap-2">
-                    <?php for ($i = 1; $i <= (int) $totalpage; $i++): ?>
-                        <?php $pageOffset = ($i - 1) * $pageSize; ?>
-                        <li class="page-item <?php echo $i === $currentPage ? 'active' : ''; ?>">
-                            <a class="page-link rounded-pill border-0 px-3" href="/lop/index/<?php echo $pageSize; ?>/<?php echo $pageOffset; ?>">
-                                <?php echo $i; ?>
-                            </a>
-                        </li>
-                    <?php endfor; ?>
+                    <?php foreach ($paginationItems as $item): ?>
+                        <?php if (is_string($item)): ?>
+                            <li class="page-item disabled">
+                                <span class="page-link rounded-pill border-0 px-3 bg-transparent text-muted">...</span>
+                            </li>
+                        <?php else: ?>
+                            <?php $pageOffset = ($item - 1) * $pageSize; ?>
+                            <li class="page-item <?php echo $item === $currentPage ? 'active' : ''; ?>">
+                                <a class="page-link rounded-pill border-0 px-3" href="/lop/index/<?php echo $pageSize; ?>/<?php echo $pageOffset; ?>">
+                                    <?php echo $item; ?>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </ul>
             </nav>
         <?php endif; ?>
