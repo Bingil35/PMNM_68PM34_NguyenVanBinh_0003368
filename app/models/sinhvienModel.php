@@ -28,6 +28,31 @@
             }
         }
 
+        public function getById($id) {
+            $query = "SELECT * FROM tbl_sinhviens WHERE id = :id LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        public function update($id, $hoten, $gioitinh, $mssv) {
+            $query = "UPDATE tbl_sinhviens SET hoten = :hoten, gioitinh = :gioitinh, mssv = :mssv WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':hoten', $hoten);
+            $stmt->bindParam(':gioitinh', $gioitinh);
+            $stmt->bindParam(':mssv', $mssv);
+            return $stmt->execute();
+        }
+
+        public function delete($id) {
+            $query = "DELETE FROM tbl_sinhviens WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        }
+
         public function paging($limit = 5, $offset = 0, $search = ""){
             $query = "SELECT * FROM tbl_sinhviens LIMIT :limit OFFSET :offset";
             $stmt = $this->conn->prepare($query);

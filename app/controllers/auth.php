@@ -2,7 +2,7 @@
 class auth {
 
     public $user = [
-        "1" => "1",
+        "binhnv" => "123456",
         "user" => "654321"
     ];
 
