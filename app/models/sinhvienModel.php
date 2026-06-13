@@ -58,10 +58,36 @@ class SinhvienModel
         return $stmt->execute();
     }
 
-    public function paging($limit = 5, $offset = 0, $keyword = '')
+    public function paging($limit = 5, $offset = 0, $keyword = '', $sort = '', $dir = 'asc')
     {
         $keyword = trim($keyword);
         $where = '';
+        $sortableColumns = ['hoten', 'mssv'];
+        $sortDirection = strtolower($dir) === 'desc' ? 'DESC' : 'ASC';
+
+        if (!in_array($sort, $sortableColumns, true)) {
+            $orderBy = 'sv.ID DESC';
+        } elseif ($sort === 'hoten') {
+            $vietnameseCollation = 'utf8mb4_vietnamese_ci';
+            $fullName = 'TRIM(sv.hoten)';
+            $spaceCount = "(LENGTH({$fullName}) - LENGTH(REPLACE({$fullName}, ' ', '')))";
+            $lastName = "SUBSTRING_INDEX({$fullName}, ' ', -1)";
+            $familyName = "SUBSTRING_INDEX({$fullName}, ' ', 1)";
+            $middleName = "CASE
+                WHEN {$spaceCount} >= 2 THEN TRIM(SUBSTRING(
+                    {$fullName},
+                    LENGTH(SUBSTRING_INDEX({$fullName}, ' ', 1)) + 1,
+                    LENGTH({$fullName}) - LENGTH(SUBSTRING_INDEX({$fullName}, ' ', 1)) - LENGTH(SUBSTRING_INDEX({$fullName}, ' ', -1))
+                ))
+                ELSE ''
+            END";
+            $orderBy = "{$lastName} COLLATE {$vietnameseCollation} {$sortDirection},
+                        {$middleName} COLLATE {$vietnameseCollation} {$sortDirection},
+                        {$familyName} COLLATE {$vietnameseCollation} {$sortDirection},
+                        sv.ID DESC";
+        } else {
+            $orderBy = "sv.mssv {$sortDirection}, sv.ID DESC";
+        }
 
         if ($keyword !== '') {
             $where = "WHERE sv.mssv LIKE :keyword
@@ -74,7 +100,7 @@ class SinhvienModel
                   FROM tbl_sinhviens sv
                   LEFT JOIN tbl_lops l ON sv.malop = l.malop
                   {$where}
-                  ORDER BY sv.ID DESC
+                  ORDER BY {$orderBy}
                   LIMIT :limit OFFSET :offset";
         $stmt = $this->conn->prepare($query);
         if ($keyword !== '') {

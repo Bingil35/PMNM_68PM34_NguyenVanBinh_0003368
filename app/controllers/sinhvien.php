@@ -9,8 +9,21 @@ class sinhvien extends Controller
     public function index($limit = 5, $offset = 0)
     {
         $keyword = trim($_GET['keyword'] ?? '');
+        $sort = $_GET['sort'] ?? '';
+        $dir = $_GET['dir'] ?? 'asc';
+        $allowedSorts = ['hoten', 'mssv'];
+        $allowedDirs = ['asc', 'desc'];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = '';
+        }
+
+        if (!in_array($dir, $allowedDirs, true)) {
+            $dir = 'asc';
+        }
+
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->paging((int) $limit, (int) $offset, $keyword);
+        $result = $sinhvienModel->paging((int) $limit, (int) $offset, $keyword, $sort, $dir);
 
         $this->view('layout/masterlayout', [
             'viewname' => 'sinhvien/index',
@@ -20,7 +33,9 @@ class sinhvien extends Controller
             'totalrecord' => $result['totalrecord'],
             'limit' => $limit,
             'offset' => $offset,
-            'keyword' => $keyword
+            'keyword' => $keyword,
+            'sort' => $sort,
+            'dir' => $dir
         ]);
     }
 
